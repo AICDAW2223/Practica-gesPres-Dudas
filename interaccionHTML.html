@@ -2,6 +2,7 @@
 <html lang="es">
     <head>
         <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="./css/estilos.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>
             <!-- TODO -->
@@ -21,6 +22,10 @@
                 <button type="button" id="anyadirgasto-formulario">
                   Añadir gasto (formulario)
                 </button>
+                <button type="button" id="cargar-gastos-api">
+                Cargar gastos (API)
+                </button>
+                <input type="text" id="nombre_usuario">
               </div>
             <div id="presupuesto">
             </div>
@@ -76,6 +81,7 @@
               </div>
               <button type="submit">Enviar</button>
               <button class="cancelar" type="button">Cancelar</button>
+              <button type="button" class="gasto-enviar-api">Enviar (API)</button>
           </form>
       </template>
         <script src="./js/generarDatosEstaticos.js" type="module">  </script>

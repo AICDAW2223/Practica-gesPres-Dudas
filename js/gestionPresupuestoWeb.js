@@ -96,6 +96,20 @@ function mostrarGastoWeb(idElemento, gasto){
 
     botonEditForm.addEventListener("click", botonEditForm1);
     divGasto.append(botonEditForm);
+
+
+
+
+    let botonBorradoApi = document.createElement("button");
+    botonBorradoApi.setAttribute("type","button")
+    botonBorradoApi.className="gasto-borrar-api";
+    botonBorradoApi.textContent="Borrar (API)"
+
+    let botonBorrarApi= Object.create(borrarApiHandle)
+    botonBorrarApi.gasto= gasto;
+    botonBorradoApi.addEventListener("click", botonBorrarApi)
+
+    divGasto.append(botonBorradoApi)
 }
 
 function mostrarGastosAgrupadosWeb(idElemento, agrup, periodo){
@@ -304,11 +318,31 @@ function nuevoGastoWebFormulario(event){
     let botonCancelar = formulario.querySelector(".cancelar")
     botonCancelar.addEventListener("click", manejadorCancelar)
 
+    let botonEnviarApi= formulario.querySelector(".gasto-enviar-api")
+    botonEnviarApi.addEventListener("click", enviarGastoApiWeb )
   
 
     let contenedor = document.getElementById("controlesprincipales")
     contenedor.append(plantillaFormulario);
 
+}
+function enviarGastoApiWeb(event){
+event.preventDefault();
+
+let descripcion1=document.getElementById("descripcion").value;
+let valor1=document.getElementById("valor").value;
+let fecha1=document.getElementById("fecha");
+let etiquetas1=document.getElementById("etiquetas").value;
+
+let arrayEtq= etiquetas1.split(`,`)
+
+let gastoEnviar={
+    
+    descripcion:descripcion1,
+    valor:valor1,
+    fecha:fecha1,
+    etiquetas:arrayEtq
+}
 }
 function manejadorSubmit(event){
     event.preventDefault()
@@ -336,6 +370,50 @@ function manejadorCancelar(event){
         document.getElementById("anyadirgasto-formulario").disabled=false;
     
 }
+let borrarApiHandle={
+    handleEvent:function(event){
+        event.preventDefault()
+        let name= document.getElementById("nombre_usuario").value
+        let url=`https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/${name}/${this.gasto.gastoId}`
+        console.log(url+" url")
+        fetch(url,{
+            method:`DELETE`
+        })
+        .then(function(respuesta){
+            if(respuesta.ok){
+
+              console.log("Borrado con exito")
+
+
+            }
+            else{
+                thow("Ha habido un error")
+            }
+        })
+        cargarGastosApi();
+    }
+}
+function cargarGastosApi(){
+
+    let input= document.getElementById("nombre_usuario").value
+    
+     fetch(`https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/${input}`)
+    .then(function (respuesta){
+        if (respuesta.ok){
+
+            return respuesta.json()
+        }
+        else{
+            throw("Ha habido un error")
+        }
+    })
+    .then(function (data){
+        gesPres.cargarGastos(data);
+    })
+    
+    repintar()
+
+}
 
 let botonActualizar= document.getElementById("actualizarpresupuesto");
 botonActualizar.addEventListener("click",actualizarPresupuestoWeb)
@@ -345,6 +423,9 @@ botonAnyadirGasto.addEventListener("click",nuevoGastoWeb);
 
 let botonAnyadirGastoFormulario= document.getElementById("anyadirgasto-formulario")
        botonAnyadirGastoFormulario.addEventListener("click", nuevoGastoWebFormulario)
+
+let botonCargarApi = document.getElementById("cargar-gastos-api")
+botonCargarApi.addEventListener("click", cargarGastosApi)
 export{
     mostrarDatoEnId,
     mostrarGastoWeb,
