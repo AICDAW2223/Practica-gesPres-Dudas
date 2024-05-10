@@ -276,6 +276,54 @@ function  EditarHandleFormulario(){
     let manejadorCerrar1 = new cerrarGastoEnviarForm()
     manejadorCerrar1.botonEditarFormulario=event.target;
     botonCancelar.addEventListener("click", manejadorCerrar1);
+
+
+    let botonEditarApi= formulario.querySelector(".gasto-enviar-api")
+    let manejadorEditarApi= new editarEnviarApi()
+    manejadorEditarApi.botonEditarFormularioApi=event.target;
+    manejadorEditarApi.gasto=this.gasto
+    botonEditarApi.addEventListener("click", manejadorEditarApi)
+
+
+    }
+}
+function editarEnviarApi (){
+    this.handleEvent=function(event){
+
+        let descripcionGastoForm =document.getElementById("descripcion").value
+        let valorGasto=document.getElementById("valor").value
+        let valorGastoForm=parseFloat(valorGasto)
+        let fechaGastoForm=document.getElementById("fecha").value
+       
+        let etiquetasGastoForm= document.getElementById("etiquetas").value
+    
+        let etiquetasArrForm= etiquetasGastoForm.split(',');
+        let gastoPruebaFormApi = {
+            descripcion: descripcionGastoForm,
+            valor: valorGastoForm,
+            fecha: fechaGastoForm,
+            etiquetas: etiquetasArrForm  
+        };
+        let input = document.getElementById("nombre_usuario").value;
+
+        fetch(`https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/${input}/${this.gasto.gastoId}`,{
+            method:'PUT',
+            headers:{
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(gastoPruebaFormApi)
+
+        }).then(function (respuesta){
+            if (respuesta.ok){
+                console.log("Operación PUT realizada con éxito")
+                cargarGastosApi();
+            }
+            else{
+                throw("Ha habido un error")
+            }
+        })
+        
+
     }
 }
 function cerrarGastoEnviarForm(){
@@ -331,7 +379,7 @@ event.preventDefault();
 
 let descripcion1=document.getElementById("descripcion").value;
 let valor1=document.getElementById("valor").value;
-let fecha1=document.getElementById("fecha");
+let fecha1=document.getElementById("fecha").value;
 let etiquetas1=document.getElementById("etiquetas").value;
 
 let arrayEtq= etiquetas1.split(`,`)
@@ -343,6 +391,25 @@ let gastoEnviar={
     fecha:fecha1,
     etiquetas:arrayEtq
 }
+let usuario = document.getElementById("nombre_usuario").value;
+fetch(`https://suhhtqjccd.execute-api.eu-west-1.amazonaws.com/latest/${usuario}`,{
+    method: `POST`,
+    headers:{
+        'Content-Type': 'application/json;charset=utf-8', 
+    },
+    body: JSON.stringify(gastoEnviar)
+})
+.then(function (respuesta){
+    if(respuesta.ok){
+        console.log("Petición POST creada con éxito")
+    }
+    else{
+        throw("ha habido un error")
+    }
+})
+cargarGastosApi()
+        event.target.form.remove()
+        document.getElementById("anyadirgasto-formulario").disabled=false;
 }
 function manejadorSubmit(event){
     event.preventDefault()
@@ -409,9 +476,10 @@ function cargarGastosApi(){
     })
     .then(function (data){
         gesPres.cargarGastos(data);
+        repintar()
     })
     
-    repintar()
+    
 
 }
 
